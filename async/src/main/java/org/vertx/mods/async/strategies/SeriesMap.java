@@ -5,13 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.deploy.impl.VertxLocator;
 import org.vertx.mods.async.AsyncResultCallback;
 import org.vertx.mods.async.Task;
-import org.vertx.mods.async.executors.TaskExecutor;
-import org.vertx.mods.async.executors.TaskMapExecutor;
 
 public class SeriesMap {
 
@@ -37,41 +32,43 @@ public class SeriesMap {
     final Map<Object, Object> results = new HashMap<>(this.tasks.size());
     final List<Object> keys = new LinkedList<>(this.tasks.keySet());
 
-    final class SeriesExecutor extends TaskMapExecutor {
-      public SeriesExecutor(Object key, Map<Object, Object> results) {
-        super(key, results);
+    final class SeriesDelegate implements ExecutionDelegate {
+      private int index;
+
+      public SeriesDelegate() {
+        this.index = -1;
       }
 
       @Override
-      public void complete() {
-        if (keys.size() == 0) {
-          that.callback.result(null, results);
-          return;
-        }
+      public void taskComplete(Object value) {
+        Object key = keys.get(this.index);
+        results.put(key, value);
+      }
 
-        Object key = keys.remove(0);
-        that.executeTask(key, new SeriesExecutor(key, results));
+      @Override
+      public void allComplete() {
+        that.callback.result(null, results);
       }
 
       @Override
       public void exception(String error) {
-        System.out.println("Error!" + error);
+        exceptionHandler.exception(error);
+      }
+
+      @Override
+      public boolean shouldContinue() {
+        return this.index < that.tasks.size() - 1;
+      }
+
+      @Override
+      public Task next() {
+        this.index++;
+        Object key = keys.get(this.index);
+        return that.tasks.get(key);
       }
     }
 
-    Object key = keys.remove(0);
-    this.executeTask(key, new SeriesExecutor(key, results));
+    new ExecutionController(new SeriesDelegate());
   }
 
-  private void executeTask(final Object key, final TaskExecutor executor) {
-    final Vertx vertx = VertxLocator.vertx;
-    vertx.runOnLoop(new Handler<Void>() {
-      @Override
-      public void handle(Void event) {
-        Task t = that.tasks.get(key);
-
-        t.perform(executor);
-      }
-    });
-  }
 }

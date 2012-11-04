@@ -25,6 +25,8 @@ async.series(
 			return;
 		}
 		
-		vertx.logger.info(results);
+		vertx.logger.info(results.get('why'));
+		vertx.logger.info(results.get('hello'));
+		vertx.logger.info(results.get('there'));
 	}
 );

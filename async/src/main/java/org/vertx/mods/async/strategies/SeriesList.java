@@ -6,13 +6,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.deploy.impl.VertxLocator;
 import org.vertx.mods.async.AsyncResultCallback;
 import org.vertx.mods.async.Task;
-import org.vertx.mods.async.executors.TaskExecutor;
-import org.vertx.mods.async.executors.TaskListExecutor;
 
 public class SeriesList {
   private final SeriesList that = this;
@@ -47,39 +42,40 @@ public class SeriesList {
 
     final List<Object> results = new ArrayList<>(this.tasks.size());
 
-    final class SeriesExecutor extends TaskListExecutor {
-      public SeriesExecutor(int index, List<Object> results) {
-        super(index, results);
+    final class SeriesDelegate implements ExecutionDelegate {
+      private int index;
+
+      public SeriesDelegate() {
+        this.index = -1;
       }
 
       @Override
-      public void complete() {
-        if (super.getIndex() == that.tasks.size() - 1) {
-          that.callback.result(null, results);
-          return;
-        }
+      public void taskComplete(Object value) {
+        results.add(this.index, value);
+      }
 
-        that.executeTask(super.getIndex() + 1, new SeriesExecutor(super.getIndex() + 1, results));
+      @Override
+      public void allComplete() {
+        that.callback.result(null, results);
       }
 
       @Override
       public void exception(String error) {
-        System.out.println("Error!" + error);
+        exceptionHandler.exception(error);
+      }
+
+      @Override
+      public boolean shouldContinue() {
+        return this.index < that.tasks.size() - 1;
+      }
+
+      @Override
+      public Task next() {
+        this.index++;
+        return that.tasks.get(index);
       }
     }
 
-    this.executeTask(0, new SeriesExecutor(0, results));
-  }
-
-  private void executeTask(final int index, final TaskExecutor executor) {
-    final Vertx vertx = VertxLocator.vertx;
-    vertx.runOnLoop(new Handler<Void>() {
-      @Override
-      public void handle(Void event) {
-        Task t = that.tasks.get(index);
-
-        t.perform(executor);
-      }
-    });
+    new ExecutionController(new SeriesDelegate());
   }
 }
