@@ -45,8 +45,6 @@ dependencies {
   provided     "org.vert-x:vertx-core:$vertxVersion"
   provided     "org.vert-x:vertx-platform:$vertxVersion"
   
-  compile       "com.hazelcast:hazelcast:$hazelcastVersion"
-
   testCompile  "org.vert-x:vertx-lang-java:$vertxVersion"
   testCompile  "org.vert-x:vertx-lang-rhino:$vertxVersion"
   testCompile( "org.vert-x:vertx-testframework:$vertxVersion" ) {
@@ -65,7 +63,6 @@ sourceSets {
 task copyMod( type:Copy, dependsOn: 'classes' ) {
   into "build/mod/$modulename-v$version"
   from 'build/classes/main'
-  from 'src/main/conf'
   into( 'lib' ) {
     from configurations.compile
   }
