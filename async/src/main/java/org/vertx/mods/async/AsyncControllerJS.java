@@ -35,6 +35,28 @@ public class AsyncControllerJS {
     AsyncController.series(convertNativeObjectToTaskMap(tasks), callback);
   }
 
+  /**
+   * Performs each task in parallel at the same time. If one of the tasks
+   * results in an error, the process is immediately aborted.
+   * 
+   * The callback is invoked when all tasks are completed, or immediately when
+   * an error occurs.
+   */
+  public void parallel(NativeArray tasks, AsyncResultCallback callback) {
+    AsyncController.parallel(convertNativeArrayToTaskArray(tasks), callback);
+  }
+
+  /**
+   * Performs each task in parallel at the same time. If one of the tasks
+   * results in an error, the process is immediately aborted.
+   * 
+   * The callback is invoked when all tasks are completed, or immediately when
+   * an error occurs.
+   */
+  public void parallel(NativeObject tasks, AsyncResultCallback callback) {
+    AsyncController.parallel(convertNativeObjectToTaskMap(tasks), callback);
+  }
+
   private Task[] convertNativeArrayToTaskArray(NativeArray arr) {
     Task[] copiedTasks = new Task[(int) arr.getLength()];
     for (int i = 0; i < arr.getLength(); i++) {

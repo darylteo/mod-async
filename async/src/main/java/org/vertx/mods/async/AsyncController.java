@@ -2,6 +2,8 @@ package org.vertx.mods.async;
 
 import java.util.Map;
 
+import org.vertx.mods.async.strategies.ParallelList;
+import org.vertx.mods.async.strategies.ParallelMap;
 import org.vertx.mods.async.strategies.SeriesList;
 import org.vertx.mods.async.strategies.SeriesMap;
 
@@ -50,8 +52,19 @@ public class AsyncController {
    * The callback is invoked when all tasks are completed, or immediately when
    * an error occurs.
    */
-  public static void parallel(Object tasks, Object doneHandler) {
+  public static void parallel(Task[] tasks, AsyncResultCallback callback) {
+    new ParallelList(tasks, callback).perform();
+  }
 
+  /**
+   * Performs each task in parallel at the same time. If one of the tasks
+   * results in an error, the process is immediately aborted.
+   * 
+   * The callback is invoked when all tasks are completed, or immediately when
+   * an error occurs.
+   */
+  public static void parallel(Map<Object, Task> tasks, AsyncResultCallback callback) {
+    new ParallelMap(tasks, callback).perform();
   }
 
   /**

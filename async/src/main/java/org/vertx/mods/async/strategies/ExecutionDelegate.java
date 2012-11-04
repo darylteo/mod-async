@@ -5,6 +5,8 @@ import org.vertx.mods.async.Task;
 public interface ExecutionDelegate {
   public abstract void taskComplete(Object value);
 
+  public abstract boolean isAllComplete();
+
   public abstract void allComplete();
 
   public abstract void exception(String message);

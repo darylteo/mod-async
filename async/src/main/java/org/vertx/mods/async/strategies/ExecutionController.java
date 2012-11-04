@@ -44,14 +44,22 @@ public class ExecutionController {
       /* Signal that the currently processing task is completed */
       delegate.taskComplete(value);
 
+      /* Check that all tasks are completed */
+      if (delegate.isAllComplete()) {
+        delegate.allComplete();
+        return;
+      }
+
       /* Check for subsequent tasks in this chain */
       if (delegate.shouldContinue()) {
         that.nextTask();
         return;
       }
 
-      /* If nothing left, then initiate the cleanup phase */
-      delegate.allComplete();
+      /*
+       * If code reaches here, this means that this particular set of tasks has
+       * been completed, but there are still other tasks executing in parallel
+       */
     }
 
   }

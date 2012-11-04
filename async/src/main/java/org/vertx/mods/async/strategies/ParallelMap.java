@@ -1,27 +1,31 @@
 package org.vertx.mods.async.strategies;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.vertx.mods.async.AsyncResultCallback;
 import org.vertx.mods.async.Task;
 
-public class SeriesMap {
-
-  private final SeriesMap that = this;
+public class ParallelMap {
+  private final ParallelMap that = this;
 
   private final Map<Object, Task> tasks;
   private final AsyncResultCallback callback;
 
   /* Constructors */
-  public SeriesMap(Map<Object, Task> tasks) {
+  public ParallelMap(Map<Object, Task> tasks) {
     this.tasks = tasks;
     this.callback = null;
   }
 
-  public SeriesMap(Map<Object, Task> tasks, AsyncResultCallback callback) {
+  public ParallelMap(Map<Object, Task> tasks, AsyncResultCallback callback) {
     this.tasks = tasks;
     this.callback = callback;
   }
@@ -32,23 +36,25 @@ public class SeriesMap {
 
     final Map<Object, Object> results = new HashMap<>(this.tasks.size());
     final List<Object> keys = new LinkedList<>(this.tasks.keySet());
+    final Set<Integer> done = new HashSet<>(this.tasks.size());
 
-    final class SeriesDelegate implements ExecutionDelegate {
+    final class ParallelDelegate implements ExecutionDelegate {
       private int index;
 
-      public SeriesDelegate() {
-        this.index = -1;
+      public ParallelDelegate(int index) {
+        this.index = index;
       }
 
       @Override
       public void taskComplete(Object value) {
         Object key = keys.get(this.index);
         results.put(key, value);
+        done.add(this.index);
       }
 
       @Override
       public boolean isAllComplete() {
-        return this.index < that.tasks.size() - 1;
+        return done.size() == that.tasks.size();
       }
 
       @Override
@@ -63,18 +69,18 @@ public class SeriesMap {
 
       @Override
       public boolean shouldContinue() {
-        return this.index < that.tasks.size() - 1;
+        return false;
       }
 
       @Override
       public Task next() {
-        this.index++;
         Object key = keys.get(this.index);
         return that.tasks.get(key);
       }
     }
 
-    new ExecutionController(new SeriesDelegate());
+    for (int i = 0; i < keys.size(); i++) {
+      new ExecutionController(new ParallelDelegate(i));
+    }
   }
-
 }

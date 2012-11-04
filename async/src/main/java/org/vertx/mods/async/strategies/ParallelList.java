@@ -3,35 +3,37 @@ package org.vertx.mods.async.strategies;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.vertx.mods.async.AsyncResultCallback;
 import org.vertx.mods.async.Task;
 
-public class SeriesList {
-  private final SeriesList that = this;
+public class ParallelList {
+  private final ParallelList that = this;
 
   private final List<Task> tasks;
   private final AsyncResultCallback callback;
 
   /* Constructors */
-  public SeriesList(Task[] tasks) {
+  public ParallelList(Task[] tasks) {
     this.tasks = Arrays.asList(tasks);
     this.callback = null;
   }
 
-  public SeriesList(Task[] tasks, AsyncResultCallback callback) {
+  public ParallelList(Task[] tasks, AsyncResultCallback callback) {
     this.tasks = Arrays.asList(tasks);
     this.callback = callback;
   }
 
-  public SeriesList(Collection<Task> tasks) {
+  public ParallelList(Collection<Task> tasks) {
     this.tasks = new LinkedList<>(tasks);
     this.callback = null;
   }
 
-  public SeriesList(Collection<Task> tasks, AsyncResultCallback callback) {
+  public ParallelList(Collection<Task> tasks, AsyncResultCallback callback) {
     this.tasks = new LinkedList<>(tasks);
     this.callback = callback;
   }
@@ -41,22 +43,24 @@ public class SeriesList {
     final ExceptionHandler exceptionHandler = new ExceptionHandler(this.callback);
 
     final List<Object> results = new ArrayList<>(this.tasks.size());
+    final Set<Integer> done = new HashSet<>(this.tasks.size());
 
-    final class SeriesDelegate implements ExecutionDelegate {
+    final class ParallelDelegate implements ExecutionDelegate {
       private int index;
 
-      public SeriesDelegate() {
-        this.index = -1;
+      public ParallelDelegate(int index) {
+        this.index = index;
       }
 
       @Override
       public void taskComplete(Object value) {
         results.add(this.index, value);
+        done.add(this.index);
       }
 
       @Override
       public boolean isAllComplete() {
-        return this.index < that.tasks.size() - 1;
+        return done.size() == that.tasks.size();
       }
 
       @Override
@@ -71,16 +75,17 @@ public class SeriesList {
 
       @Override
       public boolean shouldContinue() {
-        return this.index < that.tasks.size() - 1;
+        return false;
       }
 
       @Override
       public Task next() {
-        this.index++;
-        return that.tasks.get(index);
+        return that.tasks.get(this.index);
       }
     }
 
-    new ExecutionController(new SeriesDelegate());
+    for (int i = 0; i < this.tasks.size(); i++) {
+      new ExecutionController(new ParallelDelegate(i));
+    }
   }
 }
