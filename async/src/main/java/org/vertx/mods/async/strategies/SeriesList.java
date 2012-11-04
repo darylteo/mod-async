@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.vertx.mods.async.AsyncResultCallback;
 import org.vertx.mods.async.Task;
+import org.vertx.mods.async.results.ScriptableArrayResult;
 
 public class SeriesList {
   private final SeriesList that = this;
@@ -40,7 +41,7 @@ public class SeriesList {
   public void perform() {
     final ExceptionHandler exceptionHandler = new ExceptionHandler(this.callback);
 
-    final List<Object> results = new ArrayList<>(this.tasks.size());
+    final List<Object> results = new ScriptableArrayResult();
 
     final class SeriesDelegate implements ExecutionDelegate {
       private int index;

@@ -1,6 +1,5 @@
 package org.vertx.mods.async.strategies;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -10,6 +9,7 @@ import java.util.Set;
 
 import org.vertx.mods.async.AsyncResultCallback;
 import org.vertx.mods.async.Task;
+import org.vertx.mods.async.results.ScriptableArrayResult;
 
 public class ParallelList {
   private final ParallelList that = this;
@@ -42,7 +42,7 @@ public class ParallelList {
   public void perform() {
     final ExceptionHandler exceptionHandler = new ExceptionHandler(this.callback);
 
-    final List<Object> results = new ArrayList<>(this.tasks.size());
+    final List<Object> results = new ScriptableArrayResult();
     final Set<Integer> done = new HashSet<>(this.tasks.size());
 
     final class ParallelDelegate implements ExecutionDelegate {

@@ -21,45 +21,55 @@ public class ExecutionController {
     VertxLocator.vertx.runOnLoop(new Handler<Void>() {
       @Override
       public void handle(Void event) {
-        Task t = delegate.next();
-        if (t == null) {
-          delegate.exception("Task should not be null");
-          return;
-        }
+        try {
+          Task t = delegate.next();
+          if (t == null) {
+            delegate.exception("Task should not be null");
+            return;
+          }
 
-        t.perform(callback);
+          t.perform(callback);
+        } catch (Exception e) {
+          delegate.exception(e.getMessage());
+        }
       }
     });
   }
 
   private class Callback implements TaskResultCallback {
     @Override
-    public void result(Object e, Object value) {
-      /* Check for Exceptions */
-      if (e != null) {
-        delegate.exception(e.toString());
-        return;
+    public void result(Object err, Object value) {
+      try {
+        /* Check for Exceptions */
+        if (err != null) {
+          delegate.exception(err.toString());
+          return;
+        }
+
+        /* Signal that the currently processing task is completed */
+        delegate.taskComplete(value);
+
+        /* Check that all tasks are completed */
+        if (delegate.isAllComplete()) {
+          delegate.allComplete();
+          return;
+        }
+
+        /* Check for subsequent tasks in this chain */
+        if (delegate.shouldContinue()) {
+          that.nextTask();
+          return;
+        }
+
+        /*
+         * If code reaches here, this means that this particular set of tasks
+         * has been completed, but there are still other tasks executing in
+         * parallel
+         */
+      } catch (Exception e) {
+        e.printStackTrace();
+        delegate.exception(e.getMessage());
       }
-
-      /* Signal that the currently processing task is completed */
-      delegate.taskComplete(value);
-
-      /* Check that all tasks are completed */
-      if (delegate.isAllComplete()) {
-        delegate.allComplete();
-        return;
-      }
-
-      /* Check for subsequent tasks in this chain */
-      if (delegate.shouldContinue()) {
-        that.nextTask();
-        return;
-      }
-
-      /*
-       * If code reaches here, this means that this particular set of tasks has
-       * been completed, but there are still other tasks executing in parallel
-       */
     }
 
   }

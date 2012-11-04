@@ -1,12 +1,14 @@
 package org.vertx.mods.async.strategies;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.vertx.mods.async.AsyncResultCallback;
 import org.vertx.mods.async.Task;
+import org.vertx.mods.async.results.ScriptableObjectResult;
 
 public class SeriesMap {
 
@@ -30,25 +32,28 @@ public class SeriesMap {
   public void perform() {
     final ExceptionHandler exceptionHandler = new ExceptionHandler(this.callback);
 
-    final Map<Object, Object> results = new HashMap<>(this.tasks.size());
+    final Map<Object, Object> results = new ScriptableObjectResult();
     final List<Object> keys = new LinkedList<>(this.tasks.keySet());
+    final Set<Integer> done = new HashSet<>(this.tasks.size());
 
     final class SeriesDelegate implements ExecutionDelegate {
-      private int index;
+      private int index = 0;
 
       public SeriesDelegate() {
-        this.index = -1;
       }
 
       @Override
       public void taskComplete(Object value) {
         Object key = keys.get(this.index);
         results.put(key, value);
+        done.add(this.index);
+
+        this.index++;
       }
 
       @Override
       public boolean isAllComplete() {
-        return this.index < that.tasks.size() - 1;
+        return done.size() == that.tasks.size();
       }
 
       @Override
@@ -63,17 +68,17 @@ public class SeriesMap {
 
       @Override
       public boolean shouldContinue() {
-        return this.index < that.tasks.size() - 1;
+        return done.size() != that.tasks.size();
       }
 
       @Override
       public Task next() {
-        this.index++;
         Object key = keys.get(this.index);
         return that.tasks.get(key);
       }
     }
 
+    /* Begin */
     new ExecutionController(new SeriesDelegate());
   }
 

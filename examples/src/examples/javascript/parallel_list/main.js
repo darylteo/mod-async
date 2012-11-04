@@ -24,7 +24,13 @@ async.parallel(
 			vertx.logger.info("Error:" + error);
 			return;
 		}
+		vertx.logger.info(results[2]["haha"]);
+		vertx.logger.info(results[2]["test"]);
 		
-		vertx.logger.info(results);
+		results[2] = {
+			"haha": "changed!"
+		}
+		vertx.logger.info(results[2]["haha"]);
+		vertx.logger.info(results[2]["test"]);
 	}
 );

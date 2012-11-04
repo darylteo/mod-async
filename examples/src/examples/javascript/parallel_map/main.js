@@ -17,6 +17,10 @@ async.parallel(
 		there: function(callback){
 			vertx.logger.info("Series 3");
 			callback.result(null, { test : "Object" });
+		},
+		here: function(callback){
+			vertx.logger.info("Series 4");
+			callback.result(null, "blah");
 		}
 	},
 	function(error, results){
@@ -25,8 +29,9 @@ async.parallel(
 			return;
 		}
 		
-		vertx.logger.info(results.get('why'));
-		vertx.logger.info(results.get('hello'));
-		vertx.logger.info(results.get('there'));
+		vertx.logger.info(results.why);
+		vertx.logger.info(results.hello);
+		vertx.logger.info(results.there);
+		vertx.logger.info(results.there.test);
 	}
 );

@@ -1,9 +1,5 @@
 package org.vertx.mods.async.strategies;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +8,7 @@ import java.util.Set;
 
 import org.vertx.mods.async.AsyncResultCallback;
 import org.vertx.mods.async.Task;
+import org.vertx.mods.async.results.ScriptableObjectResult;
 
 public class ParallelMap {
   private final ParallelMap that = this;
@@ -34,7 +31,7 @@ public class ParallelMap {
   public void perform() {
     final ExceptionHandler exceptionHandler = new ExceptionHandler(this.callback);
 
-    final Map<Object, Object> results = new HashMap<>(this.tasks.size());
+    final Map<Object, Object> results = new ScriptableObjectResult();
     final List<Object> keys = new LinkedList<>(this.tasks.keySet());
     final Set<Integer> done = new HashSet<>(this.tasks.size());
 
