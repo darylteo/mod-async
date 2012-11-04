@@ -1,5 +1,5 @@
 package org.vertx.mods.async;
 
 public interface Task {
-  public Object perform();
+  public void perform(TaskResultCallback callback);
 }

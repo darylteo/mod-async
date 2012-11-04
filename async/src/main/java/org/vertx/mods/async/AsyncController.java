@@ -2,8 +2,8 @@ package org.vertx.mods.async;
 
 import java.util.Map;
 
-import org.vertx.mods.async.containers.SeriesList;
-import org.vertx.mods.async.containers.SeriesMap;
+import org.vertx.mods.async.strategies.SeriesList;
+import org.vertx.mods.async.strategies.SeriesMap;
 
 public class AsyncController {
 
@@ -16,7 +16,7 @@ public class AsyncController {
    * The callback is invoked when all tasks are completed, or immediately when
    * an error occurs.
    */
-  public static void series(Task[] tasks, ResultHandler callback) {
+  public static void series(Task[] tasks, AsyncResultCallback callback) {
     new SeriesList(tasks, callback).perform();
   }
 
@@ -27,8 +27,7 @@ public class AsyncController {
    * The callback is invoked when all tasks are completed, or immediately when
    * an error occurs.
    */
-  public static void series(Map<Object, Task> tasks, ResultHandler callback) {
-    System.out.println("Tasks" + tasks);
+  public static void series(Map<Object, Task> tasks, AsyncResultCallback callback) {
     new SeriesMap(tasks, callback).perform();
   }
 

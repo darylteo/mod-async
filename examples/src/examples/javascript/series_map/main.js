@@ -6,25 +6,25 @@ vertx.logger.info('test');
 vertx.logger.info(async);
 async.series(
 	{
-		why: function(){
-			vertx.logger.info("1");
-			return 1;
+		why: function(callback){
+			vertx.logger.info("Series 1");
+			callback.result(null, 1);
 		},
-		hello: function(){
-			vertx.logger.info("2");
-			return "TEST";
+		hello: function(callback){
+			vertx.logger.info("Series 2");
+			callback.result(null, "test");
 		},
-		there: function(){
-			vertx.logger.info("3");
-			return { test : "Object" }
+		there: function(callback){
+			vertx.logger.info("Series 3");
+			callback.result(null, { test : "Object" });
 		}
 	},
-	function(result, error){
+	function(error, results){
 		if(error){
 			vertx.logger.info("Error:" + error);
 			return;
 		}
 		
-		vertx.logger.info(result);
+		vertx.logger.info(results);
 	}
 );

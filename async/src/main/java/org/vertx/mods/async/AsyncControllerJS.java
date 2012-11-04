@@ -20,7 +20,7 @@ public class AsyncControllerJS {
    * The callback is invoked when all tasks are completed, or immediately when
    * an error occurs.
    */
-  public void series(NativeArray tasks, ResultHandler callback) {
+  public void series(NativeArray tasks, AsyncResultCallback callback) {
     AsyncController.series(convertNativeArrayToTaskArray(tasks), callback);
   }
 
@@ -31,7 +31,7 @@ public class AsyncControllerJS {
    * The callback is invoked when all tasks are completed, or immediately when
    * an error occurs.
    */
-  public void series(NativeObject tasks, ResultHandler callback) {
+  public void series(NativeObject tasks, AsyncResultCallback callback) {
     AsyncController.series(convertNativeObjectToTaskMap(tasks), callback);
   }
 
