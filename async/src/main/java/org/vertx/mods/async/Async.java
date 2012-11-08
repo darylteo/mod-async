@@ -1,13 +1,17 @@
 package org.vertx.mods.async;
 
-import java.util.Map;
-
+import org.vertx.mods.async.strategies.Auto;
 import org.vertx.mods.async.strategies.ParallelList;
 import org.vertx.mods.async.strategies.ParallelMap;
 import org.vertx.mods.async.strategies.SeriesList;
 import org.vertx.mods.async.strategies.SeriesMap;
+import org.vertx.mods.async.tasks.AutoMapTasks;
+import org.vertx.mods.async.tasks.ParallelListTasks;
+import org.vertx.mods.async.tasks.ParallelMapTasks;
+import org.vertx.mods.async.tasks.SeriesListTasks;
+import org.vertx.mods.async.tasks.SeriesMapTasks;
 
-public class AsyncController {
+public class Async {
 
   /* Async Flow Controllers */
 
@@ -18,7 +22,7 @@ public class AsyncController {
    * The callback is invoked when all tasks are completed, or immediately when
    * an error occurs.
    */
-  public static void series(Task[] tasks, AsyncResultCallback callback) {
+  public static void series(SeriesListTasks tasks, AsyncResultCallback callback) {
     new SeriesList(tasks, callback).perform();
   }
 
@@ -29,7 +33,7 @@ public class AsyncController {
    * The callback is invoked when all tasks are completed, or immediately when
    * an error occurs.
    */
-  public static void series(Map<Object, Task> tasks, AsyncResultCallback callback) {
+  public static void series(SeriesMapTasks tasks, AsyncResultCallback callback) {
     new SeriesMap(tasks, callback).perform();
   }
 
@@ -41,7 +45,7 @@ public class AsyncController {
    * The callback is invoked when all tasks are completed, or immediately when
    * an error occurs.
    */
-  public static void waterfall(Object tasks, Object callback) {
+  public static void waterfall(Object tasks, AsyncResultCallback callback) {
 
   }
 
@@ -52,7 +56,7 @@ public class AsyncController {
    * The callback is invoked when all tasks are completed, or immediately when
    * an error occurs.
    */
-  public static void parallel(Task[] tasks, AsyncResultCallback callback) {
+  public static void parallel(ParallelListTasks tasks, AsyncResultCallback callback) {
     new ParallelList(tasks, callback).perform();
   }
 
@@ -63,7 +67,7 @@ public class AsyncController {
    * The callback is invoked when all tasks are completed, or immediately when
    * an error occurs.
    */
-  public static void parallel(Map<Object, Task> tasks, AsyncResultCallback callback) {
+  public static void parallel(ParallelMapTasks tasks, AsyncResultCallback callback) {
     new ParallelMap(tasks, callback).perform();
   }
 
@@ -73,7 +77,7 @@ public class AsyncController {
    * The callback is invoked when test() returns false, or immediately when an
    * error occurs.
    */
-  public static void whilst(Object task, Object test, Object callback) {
+  public static void whilst(Object task, Object test, AsyncResultCallback callback) {
 
   }
 
@@ -85,7 +89,7 @@ public class AsyncController {
    * 
    * This is the inverse operation of whilst.
    */
-  public static void until(Object task, Object test, Object callback) {
+  public static void until(Object task, Object test, AsyncResultCallback callback) {
 
   }
 
@@ -110,8 +114,8 @@ public class AsyncController {
    * The callback is invoked when all tasks are completed, or immediately when
    * an error occurs
    */
-  public static void auto(Object tasks, Object callback) {
-
+  public static void auto(AutoMapTasks tasks, AsyncResultCallback callback) {
+    new Auto(tasks, callback);
   }
 
   /**

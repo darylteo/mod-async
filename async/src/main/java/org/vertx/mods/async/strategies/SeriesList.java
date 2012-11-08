@@ -1,39 +1,26 @@
 package org.vertx.mods.async.strategies;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.vertx.mods.async.AsyncResultCallback;
 import org.vertx.mods.async.Task;
 import org.vertx.mods.async.results.ScriptableArrayResult;
+import org.vertx.mods.async.tasks.SeriesListTasks;
 
 public class SeriesList {
   private final SeriesList that = this;
 
-  private final List<Task> tasks;
+  private final SeriesListTasks tasks;
   private final AsyncResultCallback callback;
 
   /* Constructors */
-  public SeriesList(Task[] tasks) {
-    this.tasks = Arrays.asList(tasks);
+  public SeriesList(SeriesListTasks tasks) {
+    this.tasks = tasks;
     this.callback = null;
   }
 
-  public SeriesList(Task[] tasks, AsyncResultCallback callback) {
-    this.tasks = Arrays.asList(tasks);
-    this.callback = callback;
-  }
-
-  public SeriesList(Collection<Task> tasks) {
-    this.tasks = new LinkedList<>(tasks);
-    this.callback = null;
-  }
-
-  public SeriesList(Collection<Task> tasks, AsyncResultCallback callback) {
-    this.tasks = new LinkedList<>(tasks);
+  public SeriesList(SeriesListTasks tasks, AsyncResultCallback callback) {
+    this.tasks = tasks;
     this.callback = callback;
   }
 

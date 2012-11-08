@@ -8,11 +8,11 @@ import java.util.Set;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-public class ScriptableObjectResult extends ScriptableObject implements Map<Object, Object> {
+public class ScriptableObjectResult extends ScriptableObject implements Map<String, Object> {
 
   private static final long serialVersionUID = 6453347887198780640L;
 
-  private Map<Object, Object> map;
+  private Map<String, Object> map;
 
   public ScriptableObjectResult() {
     this.map = new HashMap<>();
@@ -54,22 +54,22 @@ public class ScriptableObjectResult extends ScriptableObject implements Map<Obje
   }
 
   @Override
-  public Set<java.util.Map.Entry<Object, Object>> entrySet() {
+  public Set<java.util.Map.Entry<String, Object>> entrySet() {
     return this.map.entrySet();
   }
 
   @Override
-  public Set<Object> keySet() {
+  public Set<String> keySet() {
     return this.map.keySet();
   }
 
   @Override
-  public Object put(Object key, Object value) {
+  public Object put(String key, Object value) {
     return this.map.put(key, value);
   }
 
   @Override
-  public void putAll(Map<? extends Object, ? extends Object> m) {
+  public void putAll(Map<? extends String, ? extends Object> m) {
     this.map.putAll(m);
   }
 

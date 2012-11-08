@@ -9,21 +9,22 @@ import java.util.Set;
 import org.vertx.mods.async.AsyncResultCallback;
 import org.vertx.mods.async.Task;
 import org.vertx.mods.async.results.ScriptableObjectResult;
+import org.vertx.mods.async.tasks.SeriesMapTasks;
 
 public class SeriesMap {
 
   private final SeriesMap that = this;
 
-  private final Map<Object, Task> tasks;
+  private final SeriesMapTasks tasks;
   private final AsyncResultCallback callback;
 
   /* Constructors */
-  public SeriesMap(Map<Object, Task> tasks) {
+  public SeriesMap(SeriesMapTasks tasks) {
     this.tasks = tasks;
     this.callback = null;
   }
 
-  public SeriesMap(Map<Object, Task> tasks, AsyncResultCallback callback) {
+  public SeriesMap(SeriesMapTasks tasks, AsyncResultCallback callback) {
     this.tasks = tasks;
     this.callback = callback;
   }
@@ -32,8 +33,8 @@ public class SeriesMap {
   public void perform() {
     final ExceptionHandler exceptionHandler = new ExceptionHandler(this.callback);
 
-    final Map<Object, Object> results = new ScriptableObjectResult();
-    final List<Object> keys = new LinkedList<>(this.tasks.keySet());
+    final Map<String, Object> results = new ScriptableObjectResult();
+    final List<String> keys = new LinkedList<>(this.tasks.getNames());
     final Set<Integer> done = new HashSet<>(this.tasks.size());
 
     final class SeriesDelegate implements ExecutionDelegate {
@@ -44,7 +45,7 @@ public class SeriesMap {
 
       @Override
       public void taskComplete(Object value) {
-        Object key = keys.get(this.index);
+        String key = keys.get(this.index);
         results.put(key, value);
         done.add(this.index);
 
@@ -73,7 +74,7 @@ public class SeriesMap {
 
       @Override
       public Task next() {
-        Object key = keys.get(this.index);
+        String key = keys.get(this.index);
         return that.tasks.get(key);
       }
     }

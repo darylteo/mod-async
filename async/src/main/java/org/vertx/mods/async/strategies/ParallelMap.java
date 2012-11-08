@@ -9,20 +9,21 @@ import java.util.Set;
 import org.vertx.mods.async.AsyncResultCallback;
 import org.vertx.mods.async.Task;
 import org.vertx.mods.async.results.ScriptableObjectResult;
+import org.vertx.mods.async.tasks.ParallelMapTasks;
 
 public class ParallelMap {
   private final ParallelMap that = this;
 
-  private final Map<Object, Task> tasks;
+  private final ParallelMapTasks tasks;
   private final AsyncResultCallback callback;
 
   /* Constructors */
-  public ParallelMap(Map<Object, Task> tasks) {
+  public ParallelMap(ParallelMapTasks tasks) {
     this.tasks = tasks;
     this.callback = null;
   }
 
-  public ParallelMap(Map<Object, Task> tasks, AsyncResultCallback callback) {
+  public ParallelMap(ParallelMapTasks tasks, AsyncResultCallback callback) {
     this.tasks = tasks;
     this.callback = callback;
   }
@@ -31,8 +32,8 @@ public class ParallelMap {
   public void perform() {
     final ExceptionHandler exceptionHandler = new ExceptionHandler(this.callback);
 
-    final Map<Object, Object> results = new ScriptableObjectResult();
-    final List<Object> keys = new LinkedList<>(this.tasks.keySet());
+    final Map<String, Object> results = new ScriptableObjectResult();
+    final List<String> keys = new LinkedList<>(this.tasks.getNames());
     final Set<Integer> done = new HashSet<>(this.tasks.size());
 
     final class ParallelDelegate implements ExecutionDelegate {
@@ -44,7 +45,7 @@ public class ParallelMap {
 
       @Override
       public void taskComplete(Object value) {
-        Object key = keys.get(this.index);
+        String key = keys.get(this.index);
         results.put(key, value);
         done.add(this.index);
       }
@@ -71,8 +72,8 @@ public class ParallelMap {
 
       @Override
       public Task next() {
-        Object key = keys.get(this.index);
-        return that.tasks.get(key);
+        String key = keys.get(this.index);
+        return (Task) that.tasks.get(key);
       }
     }
 
